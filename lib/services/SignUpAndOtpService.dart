@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:gov/API_URL.dart';
 import 'package:gov/services/SharedPrefs.dart';
+import 'package:gov/views/Components/CustomDialogWidget.dart';
 import 'package:gov/views/application/Home.dart';
 import 'package:gov/views/authpage/Login.dart';
+import 'package:gov/views/authpage/LoginNew.dart';
 import 'package:gov/views/authpage/OtpVerification.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -14,14 +18,16 @@ class OtpService {
 
   // --------------->>>>>>>>>>>>>>>>>>>>>>>>>>>> sendint OTP
 
-  Future<void> sendOtp(email, username, number, password, city, bool isMale,
+  Future<void> sendOtp(email, username, number, password, city, gender,
       BuildContext context) async {
-    String gender = "Male";
-    if (isMale == true) {
-      gender = 'Male';
-    } else {
-      gender = 'FeMale';
-    }
+
+        showDialog(context: context,
+         builder: (context){
+            return Center(
+                child: SpinKitWave(color: Colors.green, size: 22,),
+            );
+         });
+
 
     final Map<String, dynamic> data = {
       "name": username.toString().trim(),
@@ -35,6 +41,8 @@ class OtpService {
     var url = Uri.parse('${API_URL.URL}/getdata');
     print('url: $url');
 
+    try{
+
     http.Response response = await http.post(
       url,
       headers: <String, String>{
@@ -47,6 +55,7 @@ class OtpService {
       Get.off(()=>OtpVerification(email), transition: Transition.cupertino);
     } 
     if (response.statusCode == 302) {
+      Get.back();
       _showPopup(email, response.body.toString(), context);
     }
     if (response.statusCode == 500) {
@@ -66,6 +75,14 @@ class OtpService {
           Text('PLEASE CHECK YOUR EMAIL'),
         ],
       )));
+    }
+    }catch(e){
+
+          if(e is SocketException && e.osError?.errorCode == 110){
+              Get.back(); 
+             _showCustomDialog('Server Down', Icons.warning_amber_outlined,
+            'Connection can\'t be made, something wrong with the server, Sorry! Please try again later');
+          }
     }
   }
 
@@ -87,7 +104,10 @@ class OtpService {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Invalid OTP')));
       }
-    } catch (e) {}
+    } catch (e) {
+        _showCustomDialog('Server Down', Icons.warning_amber, 
+        'Connection can\'t be made, something wrong with the server, Sorry! Please try again later');
+    }
   }
 
 
@@ -171,7 +191,7 @@ class OtpService {
             actions: [
               FilledButton.tonal(
                   onPressed: () {
-                   Get.offAll(()=>Login(), transition: Transition.circularReveal ,duration: Duration(seconds: 1));
+                   Get.offAll(()=>LoginNew(), transition: Transition.circularReveal ,duration: Duration(seconds: 1));
                   },
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -200,5 +220,15 @@ class OtpService {
             ],
           );
         });
+  }
+
+   void _showCustomDialog(String title, IconData icon, String content) {
+    Get.dialog(
+      CustomDialogWidget(
+        dialogTitle: title,
+        mainIcon: icon,
+        dialogContent: content,
+      ),
+    );
   }
 }

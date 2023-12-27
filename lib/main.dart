@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 // import 'package:gov/views/authpage/Login.dart';
 import 'package:gov/views/application/Home.dart';
 import 'package:get/get.dart';
+import 'package:gov/views/authpage/LoginNew.dart';
 
 void main() {
   runApp(const MyApp());

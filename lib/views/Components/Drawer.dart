@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gov/views/application/CheckUpdate.dart';
 import 'package:gov/views/authpage/Login.dart';
+import 'package:gov/views/authpage/LoginNew.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyDrawer extends StatefulWidget {
@@ -93,7 +94,7 @@ class _MyDrawerState extends State<MyDrawer> {
             onTap: () async{
             final  SharedPreferences prefs =await SharedPreferences.getInstance();
               prefs.setBool('loggedIn', false);
-              Get.offAll(Login());
+              Get.offAll(LoginNew());
             },
           ),
         ],

@@ -127,6 +127,7 @@ class _HomeState extends State<Home> {
                 DiscoverBy(
                     onTap: () {
                       print('budget');
+                      
                     },
                     mainImage: 'assets/images/icons/budget.jpeg',
                     mainText: 'Budget',
